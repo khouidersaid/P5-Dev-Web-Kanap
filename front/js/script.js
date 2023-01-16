@@ -7,7 +7,7 @@ fetch("http://localhost:3000/api/products")
     }
   })
   .then((datas) => {
-    console.log(datas)
+    console.log(datas);
     let html = ""
     // Pour chaque élément dans les données JSON
     datas.forEach(element => {
