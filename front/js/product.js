@@ -1,12 +1,18 @@
 var searchParams = new URLSearchParams(location.search);
 console.log(searchParams.get("id"));
-fetch("http://localhost:3000/api/products/" + searchParams.get("id"))
+
+const productId =  searchParams.get("id");
+
+fetch("http://localhost:3000/api/products/"+  productId)         //searchParams.get("id"))
   .then((response) => response.json())
   .then((product) => {
-    console.log(product)
     renderProduct(product);
     updatePageTitle(product.name);
+    
+    document.querySelector("#addToCart").addEventListener("click",() => addToCart(product));
   })
+
+
 
   .catch((err) => {
     const errBloc = document.querySelector(".item");
@@ -16,7 +22,7 @@ fetch("http://localhost:3000/api/products/" + searchParams.get("id"))
   document.addEventListener('DOMContentLoaded', function() {
     // code
   })
-  document.querySelector("#addToCart").addEventListener("click",addToCart);
+
 
 function renderProduct(product) {
   document.getElementsByClassName(
@@ -25,6 +31,8 @@ function renderProduct(product) {
   document.getElementById("title").innerHTML = product.name;
   document.getElementById("price").innerHTML = product.price;
   document.getElementById("description").innerHTML = product.description;
+
+
   //la constante "colorList" va référencier l'élément select (Id=colors)
   const colorsList = document.getElementById("colors");
   product.colors.forEach((color) => {
@@ -38,7 +46,7 @@ function renderProduct(product) {
     colorsList.appendChild(colorEl);
 
     //quantité entre 1 et 100 produits
-    var input = document.getElementById("quantity");
+    const input = document.getElementById("quantity");
     input.setAttribute("value", "1");
   });
 }
@@ -47,24 +55,78 @@ function renderProduct(product) {
 function updatePageTitle(name) {
   // Récupération de la balise title
   let title = document.querySelector("title");
-
+  
   // Mise à jour du contenu de la balise title avec le nom du produit
   title.innerHTML = name + " - My e-commerce site";
 }
 
 
-//Fonction pour ajouter un produit au panier
-function addToCart(product) {
-  //Récupération des produits existants dans le panier
-  let cart = JSON.parse(localStorage.getItem("cart")) || [];
-  //Ajout du produit au panier
-  cart.push(product);
-  //Mise à jour du panier dans le localStorage
-  localStorage.setItem("cart", JSON.stringify(cart));
+function updateCart(cart) // Met à jour le panier ->
+{
+  // todo
 }
 
+//Fonction pour ajouter un produit au panier
+function addToCart(product) {
+  console.log(product) // OK
 
-//Fonction pour récupérer les produits du panier
+  //récupérer la couleur de produit
+  const choosenColor = document.querySelector('#colors').value
+  
+  //afficher un message si le client n'a pas choisi une couleur
+  if (!choosenColor) {
+    alert('Veuillez sélectionner une couleur')
+  }
+
+
+  // Récupérer la quantité sélectionné 
+  const productquantity = document.querySelector('#quantity').value
+  // Si quantité < 1 : Erreur
+  if (!productquantity) {
+    alert('veuillez choisir une quantité')
+  }
+
+  
+  let newItem = {
+    qty: parseInt  (productquantity),
+    option: productId,
+    price: product.price,
+    color: choosenColor,
+    image: product.imageUrl,
+    alt: product.altTxt,
+    description: product.description,
+    title: product.name
+  };
+
+
+  /*if (cart) {
+    const found = cart.find(
+      (element)=>
+      element.option == newItem.option &&
+      element.color == newItem.color
+    );
+    if (found) {
+      let newQuantity = newItem.qty + found.qty;
+    found.qty = newQuantity;
+  } else {
+    cart.push(newItem);
+    localStorage.setItem("cart", JSON.stringify(cart));
+        }
+   }*/
+    
+
+
+  //Récupération des produits existants dans le panier
+  let cart = getCart();
+  //Ajout du produit au panier
+  cart.push(newItem);
+  //Mise à jour du panier dans le localStorage
+
+  // updateCart(cart);
+  localStorage.setItem("cart", JSON.stringify(cart));
+     }
+
+
 function getCart() {
   return JSON.parse(localStorage.getItem("cart")) || [];
 }
@@ -82,41 +144,25 @@ function displayCart() {
     productEl.innerHTML = `${product.name} - ${product.price} €`;
     cartContainer.appendChild(productEl);
   });
-}
-
-
-
-
-//Fonction pour gérer l'événement click sur le bouton "Ajouter au panier"
-function handleAddToCartClick(event) {
-  //Récupération des données du produit
-  let product = {
-    _id: event.target.getAttribute("data-product-id"),
-    name: event.target.getAttribute("data-product-name"),
-    price: event.target.getAttribute("data-product-price"),
-    imageUrl: event.target.getAttribute("data-product-image"),
-    description: event.target.getAttribute("data-product-description"),
-    colors: event.target.getAttribute("data-product-colors"),
-    altTxt: event.target.getAttribute("data-product-alt"),
-    quantity: 1,
-  };
-
-
+} 
 
   
-  //Ajout du produit au panier
-  addToCart(product);
-  //Afficher les produits du panier
-  displayCart();
-}
 
 
 
-//Attacher l'événement click sur le bouton "Ajouter au panier"
-let addToCartButton = document.getElementById("addToCart");
-addToCartButton.addEventListener("click", handleAddToCartClick);
 
-let url = button.getAttribute("data-url");
-window.location.href = url;
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
