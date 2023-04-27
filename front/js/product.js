@@ -1,3 +1,5 @@
+import * as tools from "./index.js";
+
 var searchParams = new URLSearchParams(location.search);
 const productId = searchParams.get("id");
 
@@ -7,12 +9,12 @@ fetch("http://localhost:3000/api/products/" + productId) //searchParams.get("id"
   .then((product) => {
     renderProduct(product);
     updatePageTitle(product.name);
-   
+
     document
-    // ajouter un ecouteur d'évenemnt.
+      // ajouter un ecouteur d'évenemnt.
       .querySelector("#addToCart")
       // attacher l'écouteur d'evenment click au bouton.
-      .addEventListener("click", () => addToCart(product));
+      .addEventListener("click", () => addToCart(product._id));
   })
   //afficher un message d’erreur à l’utilisateur lorsqu’une erreur se produit dans la chaîne de promesse.
   .catch((err) => {
@@ -20,8 +22,16 @@ fetch("http://localhost:3000/api/products/" + productId) //searchParams.get("id"
     errBloc.innerHTML = `Une erreur est survenue (${err})`;
   });
 
+
+
+
+
+
+
+
 // afficher les informations de produit dans la page product.
 function renderProduct(product) {
+  //console.log(product);
   document.getElementsByClassName(
     "item__img"
   )[0].innerHTML = `<img src="${product.imageUrl}" alt="${product.altTxt}">`;
@@ -47,6 +57,13 @@ function renderProduct(product) {
   });
 }
 
+
+
+
+
+
+
+
 // Fonction pour mettre à jour le titre de la page en fonction du produit courant
 function updatePageTitle(name) {
   // Récupération de la balise title
@@ -56,9 +73,15 @@ function updatePageTitle(name) {
   title.innerHTML = name + " - My e-commerce site";
 }
 
-//Fonction pour ajouter un produit au panier
-function addToCart(product) {
 
+
+
+
+
+
+
+//Fonction pour ajouter un produit au panier
+function addToCart(productId) {
   //récupérer la couleur de produit
   const choosenColor = document.querySelector("#colors").value;
 
@@ -83,7 +106,7 @@ function addToCart(product) {
   };
 
   //mettre à jour la quantité si un produit de même couleur et de même id existe déja dans le pannier,
-const cart = getCart();
+  const cart = tools.getCart();
   if (cart) {
     const found = cart.find(
       (element) => element._id == newItem._id && element.color == newItem.color
@@ -96,25 +119,4 @@ const cart = getCart();
     }
     localStorage.setItem("cart", JSON.stringify(cart));
   }
-}
-
-function getCart() {
-  return JSON.parse(localStorage.getItem("cart")) || [];
-}
-
-
-
-//Fonction pour afficher les produits du panier
-function displayCart() {
-  let cart = getCart();
-  let cartContainer = document.getElementById("cart__items");
-  //Vider le conteneur avant de l'afficher
-  cartContainer.innerHTML = "";
-  //Parcourir les produits du panier
-  cart.forEach((product) => {
-    //Création d'un élément pour afficher le produit
-    let productEl = document.createElement("div");
-    productEl.innerHTML = `${product.name} - ${product.price} €`;
-    cartContainer.appendChild(productEl);
-  });
 }
